@@ -11,7 +11,7 @@ const { GITHUB_USER, GITHUB_REPO, GITHUB_FILE_PATH, GITHUB_TOKEN } = process.env
 
 // Serve index.html for the root route
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+  res.sendFile(__dirname + '/index.html');
 });
 
 // Endpoint to update JSON
