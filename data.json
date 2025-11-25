@@ -1,10 +1,1 @@
-{
-  "channels": [
-    {
-      "baseLink": "https://old-link.com",
-      "name": "exampleChannel",
-      "otherProperty": "value"
-    }
-  ],
-  "anotherKey": "anotherValue"
-}
+
