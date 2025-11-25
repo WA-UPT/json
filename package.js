@@ -1,0 +1,18 @@
+{
+  "name": "github-json-updater",
+  "version": "1.0.0",
+  "description": "Update GitHub JSON file via Node.js backend and front-end",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.12"
+  }
+}

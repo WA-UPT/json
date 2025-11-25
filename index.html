@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Update GitHub JSON Link</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 400px;
+    }
+
+    h2 { margin-bottom: 20px; color: #333; }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+    button {
+      background: #007bff;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    #message { margin-top: 15px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Update GitHub JSON Link</h2>
+  <input type="text" id="newLink" placeholder="Enter new link">
+  <button id="updateBtn">Update Link</button>
+  <div id="message"></div>
+</div>
+
+<script>
+  const updateBtn = document.getElementById('updateBtn');
+  const messageDiv = document.getElementById('message');
+
+  updateBtn.addEventListener('click', async () => {
+    const newLink = document.getElementById('newLink').value.trim();
+    if (!newLink) {
+      messageDiv.textContent = 'Please enter a valid link!';
+      messageDiv.style.color = 'red';
+      return;
+    }
+
+    try {
+      const res = await fetch('/update-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newLink })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        messageDiv.textContent = 'Link updated successfully!';
+        messageDiv.style.color = 'green';
+      } else {
+        messageDiv.textContent = 'Error updating link!';
+        messageDiv.style.color = 'red';
+      }
+    } catch (err) {
+      messageDiv.textContent = 'Server error!';
+      messageDiv.style.color = 'red';
+    }
+  });
+</script>
+
+</body>
+</html>
