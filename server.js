@@ -1,34 +1,33 @@
-// server.js
 const express = require('express');
-const fetch = require('node-fetch'); // npm install node-fetch@2
+const fetch = require('node-fetch'); 
 const bodyParser = require('body-parser');
-require('dotenv').config();
 
 const app = express();
 app.use(bodyParser.json());
-app.use(express.static('public')); // serve static files
+app.use(express.static('public'));
 
-const { GITHUB_USER, GITHUB_REPO, GITHUB_FILE_PATH, GITHUB_TOKEN } = process.env;
+const GITHUB_USER = 'WA-UPT';
+const GITHUB_REPO = 'json';
+const GITHUB_FILE_PATH = 'data.json';
+const GITHUB_TOKEN = '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'; 
 
-// Serve index.html for the root route
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-// Endpoint to update JSON
+
 app.post('/update-link', async (req, res) => {
   const { newLink } = req.body;
   if (!newLink) return res.status(400).json({ error: 'No link provided' });
 
   try {
     if (!GITHUB_USER || !GITHUB_REPO || !GITHUB_FILE_PATH || !GITHUB_TOKEN) {
-      return res.status(500).json({ error: 'GitHub environment variables not properly set' });
+      return res.status(500).json({ error: 'GitHub credentials not set' });
     }
 
     const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
-    console.log('Fetching file info from GitHub API:', apiUrl);
+    console.log('Fetching file info from GitHub API:',apiUrl);
 
-    // Fetch file info
     const fileRes = await fetch(apiUrl, {
       headers: {
         'Authorization': `token ${GITHUB_TOKEN}`,
@@ -37,6 +36,9 @@ app.post('/update-link', async (req, res) => {
     });
 
     const fileText = await fileRes.text();
+    if (fileRes.status === 401) {
+      return res.status(401).json({ error: 'GitHub token is invalid or missing permissions' });
+    }
     if (!fileRes.ok) {
       console.error('GitHub API error:', fileText);
       throw new Error(`Failed to fetch file info: ${fileRes.status} ${fileRes.statusText}`);
@@ -44,7 +46,6 @@ app.post('/update-link', async (req, res) => {
 
     const fileData = JSON.parse(fileText);
 
-    // Decode, update, and re-encode content
     const contentObj = JSON.parse(Buffer.from(fileData.content, 'base64').toString('utf-8'));
     if (!contentObj.channels || !Array.isArray(contentObj.channels) || !contentObj.channels[0]) {
       return res.status(500).json({ error: 'Invalid JSON structure in GitHub file' });
@@ -53,7 +54,6 @@ app.post('/update-link', async (req, res) => {
     contentObj.channels[0].baseLink = newLink;
     const updatedContent = Buffer.from(JSON.stringify(contentObj, null, 2)).toString('base64');
 
-    // Send PUT request to update file
     const updateRes = await fetch(apiUrl, {
       method: 'PUT',
       headers: {
@@ -74,13 +74,11 @@ app.post('/update-link', async (req, res) => {
     }
 
     res.json({ success: true, result: updateResult });
-
   } catch (err) {
     console.error('Error in /update-link:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Use PORT from Heroku or fallback
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
