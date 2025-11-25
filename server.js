@@ -1,32 +1,36 @@
+// server.js
 const express = require('express');
-const fetch = require('node-fetch'); 
+const fetch = require('node-fetch'); // npm install node-fetch@2
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+// 🔑 GitHub credentials from environment variables
 const GITHUB_USER = 'WA-UPT';
 const GITHUB_REPO = 'json';
 const GITHUB_FILE_PATH = 'data.json';
-const GITHUB_TOKEN = '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'; 
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
+// Serve index.html
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-
+// Update JSON endpoint
 app.post('/update-link', async (req, res) => {
   const { newLink } = req.body;
   if (!newLink) return res.status(400).json({ error: 'No link provided' });
 
   try {
     if (!GITHUB_USER || !GITHUB_REPO || !GITHUB_FILE_PATH || !GITHUB_TOKEN) {
-      return res.status(500).json({ error: 'GitHub credentials not set' });
+      return res.status(500).json({ error: 'GitHub credentials not set in Config Vars' });
     }
 
     const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
-    console.log('Fetching file info from GitHub API:',apiUrl);
+    console.log('Fetching file info from GitHub API:', apiUrl);
 
     const fileRes = await fetch(apiUrl, {
       headers: {
@@ -80,5 +84,6 @@ app.post('/update-link', async (req, res) => {
   }
 });
 
-const PORT = 3000;
+// Use Heroku PORT or fallback
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
