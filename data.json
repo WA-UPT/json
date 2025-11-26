@@ -1,1 +1,9 @@
-
+{
+  "channels": [
+    {
+      "react": "📢",
+      "forwardTo": "120363888888@g.us",
+      "baseLink": "🥲"
+    }
+  ]
+}
